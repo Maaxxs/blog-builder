@@ -3,11 +3,18 @@ from flask import Flask, jsonify, request
 
 
 app = Flask(__name__)
-#  app.config["DEBUG"] = True
+# config
+app.config.from_object("config")
 
-#  @app.route("/")
-#  def index():
-#      return "Ok"
+try:
+    app.config.from_envvar("PROD_APP_SETTINGS")
+except:
+    print("[INFO]: Env variable PROD_APP_SETTINGS not set. Using default settings")
+
+# Printing variables for testing
+#  print(app.config["DEBUG"])
+#  print(app.config["TOKEN"])
+
 
 @app.route("/api/github/push", methods=["POST"])
 def push_received():
