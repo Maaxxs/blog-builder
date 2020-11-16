@@ -18,11 +18,12 @@ logging.basicConfig(
 
 try:
     app.config.from_envvar("PROD_APP_SETTINGS")
-    api.logger.info("Production settings loaded")
-except:
+    app.logger.info("Production settings loaded")
+except Exception as err:
     app.logger.warning(
         "Do NOT use in production! Env variable PROD_APP_SETTINGS not set and defaults are used."
     )
+    app.logger.error(err)
 
 
 """
