@@ -11,7 +11,10 @@ git pull --recurse-submodules
 hugo
 
 # Make .tar.gz backup of last version
-tar -czf last_version.tar.gz /var/www/html
+# -P is --absolute-names. Gets rid of message
+# "tar: Removing leading '/' from member names"
+# which is printed to stderr and stops this script
+tar -czPf last_version.tar.gz /var/www/html
 
 # Update content
 rm -rf /var/www/html/*
