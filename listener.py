@@ -5,10 +5,11 @@ import logging
 import subprocess
 
 app = Flask(__name__)
-# config
+
+# Load default config
 app.config.from_object("config")
 
-# Logging to file
+# Logging to file, level is debug
 logging.basicConfig(
     filename=app.config["LOGFILE"],
     format="[%(asctime)s] [%(levelname)s] %(message)s",
@@ -19,11 +20,12 @@ logging.basicConfig(
 try:
     app.config.from_envvar("PROD_APP_SETTINGS")
     app.logger.info("Production settings loaded")
+    app.logger.setLevel(logging.INFO)
 except Exception as err:
     app.logger.warning(
         "Do NOT use in production! Env variable PROD_APP_SETTINGS not set and defaults are used."
     )
-    app.logger.error(err)
+    app.logger.info(err)
 
 
 """
