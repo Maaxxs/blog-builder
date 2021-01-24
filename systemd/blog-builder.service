@@ -1,0 +1,14 @@
+[Unit]
+Description=Blog Builder service
+After=network.target
+
+[Service]
+Type=simple
+User=max
+WorkingDirectory=/home/max/dev/blog-builder/
+ExecStart=PROD_APP_SETTINGS="prod_config.py" pipenv run gunicorn -c gunicorn.conf.py listener:app
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=default.target
