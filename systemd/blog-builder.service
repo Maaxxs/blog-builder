@@ -6,7 +6,8 @@ After=network.target
 Type=simple
 User=max
 WorkingDirectory=/home/max/dev/blog-builder/
-ExecStart=PROD_APP_SETTINGS="prod_config.py" pipenv run gunicorn -c gunicorn.conf.py listener:app
+Environment="PROD_APP_SETTINGS=prod_config.py"
+ExecStart=/home/max/.local/bin/pipenv run gunicorn -c gunicorn.conf.py listener:app
 Restart=always
 RestartSec=5s
 
