@@ -3,10 +3,13 @@
 # Stop if any commands fails
 set -e
 
-cd /home/max/dev/blog/
+# update wiki repo
+cd /home/max/dev/blog/content/wiki
+git pull
 
-# also fetch possible updates in the wiki repo
-git pull --recurse-submodules
+# update main repo
+cd /home/max/dev/blog
+git pull
 
 hugo
 
