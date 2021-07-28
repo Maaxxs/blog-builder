@@ -3,13 +3,9 @@
 # Stop if any commands fails
 set -e
 
-# update wiki repo
-cd /home/max/dev/blog/content/wiki
-git pull
-
-# update main repo
 cd /home/max/dev/blog
 git pull
+git submodule update --init
 
 hugo
 
