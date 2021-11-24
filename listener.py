@@ -3,6 +3,7 @@ from hashlib import sha256
 import hmac
 import logging
 import subprocess
+import json
 
 app = Flask(__name__)
 
@@ -26,6 +27,26 @@ except Exception as err:
         "Do NOT use in production! Env variable PROD_APP_SETTINGS not set and defaults are used."
     )
     app.logger.info(err)
+
+
+def build_site(name: str):
+    if name == "blog":
+        with open(app.config["BUILD_SCRIPT_BLOG_LOG"], "w") as outputfile:
+            # pipe stderr to stdout and capture this in the log file
+            subprocess.run(
+                app.config["BUILD_SCRIPT_BLOG"],
+                stdout=outputfile,
+                stderr=subprocess.STDOUT,
+            )
+        # TODO: Maybe send the logfile via email.
+    elif name == "wiki":
+        with open(app.config["BUILD_SCRIPT_WIKI_LOG"], "w") as outputfile:
+            # pipe stderr to stdout and capture this in the log file
+            subprocess.run(
+                app.config["BUILD_SCRIPT_WIKI"],
+                stdout=outputfile,
+                stderr=subprocess.STDOUT,
+            )
 
 
 """
@@ -64,16 +85,15 @@ def push_received():
         # secure compare
         if hmac.compare_digest(github_signature, signature):
             app.logger.info("Signature validation successful")
+            data = json.loads(request.data)
+            repository_name = data.get("repository", {}).get("name")
+            app.logger.info(f"Push event from repository: {repository_name}")
 
-            with open(app.config["BUILD_SCRIPT_LOG"], "w") as outputfile:
-                # pipe stderr to stdout and capture this in the log file
-                subprocess.run(
-                    app.config["BUILD_SCRIPT"],
-                    stdout=outputfile,
-                    stderr=subprocess.STDOUT,
-                )
-                # TODO: Maybe send the logfile via email.
-
+            # build site depending on where the push originated
+            if repository_name is not None:
+                build_site(repository_name.lower())
+            else:
+                app.logger.info("Could not find a repository name")
         else:
             app.logger.error(
                 f"Signatures do not match\nGithub: {github_signature}\n  Ours: {signature}"
